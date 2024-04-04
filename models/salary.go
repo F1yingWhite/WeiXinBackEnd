@@ -33,6 +33,19 @@ func CreateSalary(salary *Salary) error {
 	return nil
 }
 
+func GetSalaries(page, pageSize int) ([]Salary, error) {
+	logPrefix := "[models/Salary]: GetSalaries()"
+
+	log.Printf("%s: 正在查询...", logPrefix)
+	var salaries []Salary
+	if err := DB.Offset((page - 1) * pageSize).Limit(pageSize).Find(&salaries).Error; err != nil {
+		log.Printf("%s: 查询失败(%s)", logPrefix, err)
+		return nil, err
+	}
+	log.Printf("%s: 查询成功", logPrefix)
+	return salaries, nil
+}
+
 func GetSalaryById(id uint) (*Salary, error) {
 	logPrefix := fmt.Sprintf("[models/Salary]: GetSalaryById(id: %d)", id)
 
@@ -46,12 +59,52 @@ func GetSalaryById(id uint) (*Salary, error) {
 	return &salary, nil
 }
 
-func GetSalaryByUserId(user_id string) ([]Salary, error) {
+func GetSalaryByCompany(company string, page, pageSize int) ([]Salary, error) {
+	logPrefix := fmt.Sprintf("[models/Salary]: GetSalaryByCompany(company: %s)", company)
+
+	log.Printf("%s: 正在查询...", logPrefix)
+	var salaries []Salary
+	//修改为模糊查询
+	if err := DB.Where("company LIKE ?", "%"+company+"%").Offset((page - 1) * pageSize).Limit(pageSize).Find(&salaries).Error; err != nil {
+		log.Printf("%s: 查询失败(%s)", logPrefix, err)
+		return nil, err
+	}
+	log.Printf("%s: 查询成功", logPrefix)
+	return salaries, nil
+}
+
+func GetSalaryByCity(city string, page, pageSize int) ([]Salary, error) {
+	logPrefix := fmt.Sprintf("[models/Salary]: GetSalaryByCity(city: %s)", city)
+
+	log.Printf("%s: 正在查询...", logPrefix)
+	var salaries []Salary
+	if err := DB.Where("city = ?", city).Offset((page - 1) * pageSize).Limit(pageSize).Find(&salaries).Error; err != nil {
+		log.Printf("%s: 查询失败(%s)", logPrefix, err)
+		return nil, err
+	}
+	log.Printf("%s: 查询成功", logPrefix)
+	return salaries, nil
+}
+
+func GetSalariesByCompanyAndCity(company, city string, page, pageSize int) ([]Salary, error) {
+	logPrefix := fmt.Sprintf("[models/Salary]: GetSalariesByCompanyAndCity(company: %s, city: %s)", company, city)
+
+	log.Printf("%s: 正在查询...", logPrefix)
+	var salaries []Salary
+	if err := DB.Where("company LIKE ? AND city = ?", "%"+company+"%", city).Offset((page - 1) * pageSize).Limit(pageSize).Find(&salaries).Error; err != nil {
+		log.Printf("%s: 查询失败(%s)", logPrefix, err)
+		return nil, err
+	}
+	log.Printf("%s: 查询成功", logPrefix)
+	return salaries, nil
+}
+
+func GetSalaryByUserId(user_id string, page, pageSize int) ([]Salary, error) {
 	logPrefix := fmt.Sprintf("[models/Salary]: GetSalaryByUserId(user_id: %s)", user_id)
 
 	log.Printf("%s: 正在查询...", logPrefix)
 	var salaries []Salary
-	if err := DB.Where("user_id = ?", user_id).Find(&salaries).Error; err != nil {
+	if err := DB.Where("user_id = ?", user_id).Offset((page - 1) * pageSize).Limit(pageSize).Find(&salaries).Error; err != nil {
 		log.Printf("%s: 查询失败(%s)", logPrefix, err)
 		return nil, err
 	}
