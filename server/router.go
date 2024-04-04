@@ -26,14 +26,30 @@ func InitRouter() *gin.Engine {
 		api.POST("ping", service.Reply)
 		trueApi := api.Group("")
 		{
-			// get /api/search?company=xxx&city=xxx | 用于检索信息
-			trueApi.GET("search", service.HandlerBindQuery(&service.Search{}))
 			user := trueApi.Group("user")
 			{
 				// get /api/user/get?user_id=xxx | 用于获取用户信息
 				user.GET("get", service.HandlerNoBind(&service.UserInfo{}))
 				// post /api/user/update | 用于更新用户信息
 				user.POST("update", service.HandlerBind(&service.UpdateUserInfo{}))
+			}
+
+			salary := trueApi.Group("salary")
+			{
+				// get /api/get?pagesize=?&page=? | 用于检索信息
+				salary.GET("get", service.HandlerBindQuery(&service.GetSalary{}))
+				// get /api/getByCompany?pagesize=?&page=?&company=? | 用于检索信息
+				salary.GET("getByCompany", service.HandlerBindQuery(&service.GetSalaryByCompany{}))
+				// get /api/getByCity?pagesize=?&page=?&city=? | 用于检索信息
+				salary.GET("getByCity", service.HandlerBindQuery(&service.GetSalaryByCity{}))
+				// get /api/getByCompanyAndCity?pagesize=?&page=?&company=?&city=? | 用于检索信息
+				salary.GET("getByCompanyAndCity", service.HandlerBindQuery(&service.GetSalariesByCompanyAndCity{}))
+				// get /api/getByUserId?pagesize=?&page=?&user_id=? | 用于检索信息
+				salary.GET("getByUserId", service.HandlerBindQuery(&service.GetSalaryByUserId{}))
+				// get /api/getById?pagesize=?&page=?&id=? | 用于检索信息
+				salary.GET("getById", service.HandlerBindQuery(&service.GetSalaryById{}))
+				// post /api/salary/create | 用于创建信息
+				salary.POST("create", service.HandlerBind(&service.CreateSalary{}))
 			}
 		}
 	}
