@@ -1,13 +1,15 @@
 package server
 
 import (
+	"weixin_backend/server/service"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func InitRouter() *gin.Engine {
 	r := gin.New()
-
+	r.Use(gin.Logger())
 	//一些基础配置
 	config := cors.DefaultConfig()
 	config.ExposeHeaders = []string{"Authorization"}
@@ -19,17 +21,9 @@ func InitRouter() *gin.Engine {
 	api := r.Group("api")
 	api.Use(gin.Recovery())
 	{
-		// v2 := api.Group("v2")
-		// {
-		// 	v2.GET("file/:id", service.HandlerBindUri(&service.DownloadFileById{}))
-
-		// 	auth := v2.Group("")
-		// 	auth.Use(middlewares.JWTAuth())
-		// 	{
-		// 		auth.GET("notifications", service.HandlerBindUri(&user_service.GetNotifications{}))
-		// 	}
-		// }
+		//默认接口，用于
+		api.GET("ping", service.WX_authorization)
+		api.POST("ping", service.Reply)
 	}
-
 	return r
 }
