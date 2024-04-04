@@ -35,5 +35,6 @@ func InitDB() {
 }
 
 func Migrate() {
-	// DB.AutoMigrate(&User{})
+	DB.AutoMigrate(&User{})
+	DB.AutoMigrate(&Salary{})
 }
