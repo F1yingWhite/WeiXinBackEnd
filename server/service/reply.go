@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"unicode"
 	"weixin_backend/models"
 
 	"github.com/gin-gonic/gin"
@@ -98,7 +99,17 @@ type InnerApi struct {
 	JsonData map[string]interface{} `json:"json_data"`
 }
 
+func cleanInput(input string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsSpace(r) {
+			return ' '
+		}
+		return r
+	}, input)
+}
+
 func matchInnerApi(jsonStr string) (InnerApi, error) {
+	jsonStr = cleanInput(jsonStr)
 	var api InnerApi
 	err := json.Unmarshal([]byte(jsonStr), &api)
 	if err != nil {

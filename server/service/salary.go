@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"weixin_backend/models"
 
 	"github.com/gin-gonic/gin"
@@ -30,6 +31,58 @@ func (createSalary *CreateSalary) Handle(c *gin.Context) (any, error) {
 	}
 
 	err := models.CreateSalary(salary)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{"msg": "success"}, nil
+}
+
+type CreateSalaries struct {
+	Salaries []models.Salary `form:"salaries" binding:"required"`
+}
+
+func (createSalaries *CreateSalaries) Handle(c *gin.Context) (any, error) {
+	authorization := c.Request.Header.Get("Authorization")
+	for i := range createSalaries.Salaries {
+		createSalaries.Salaries[i].UserId = authorization
+		err := models.CreateSalary(&createSalaries.Salaries[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return map[string]interface{}{"msg": "success"}, nil
+}
+
+type UpdateSalary struct {
+	Id             uint   `form:"id" binding:"required"`
+	Company        string `form:"company" binding:"required"`
+	City           string `form:"city" binding:"required"`
+	Salary         string `form:"salary" binding:"required"`
+	Major          string `form:"major" binding:"required"`
+	Name           string `form:"name" binging:"required"`
+	CategoryFirst  string `form:"category_first" binging:"required"`
+	CategorySecond string `form:"category_second" binging:"required"`
+}
+
+func (updatesalary *UpdateSalary) Handle(c *gin.Context) (any, error) {
+	authorization := c.Request.Header.Get("Authorization")
+	salary, err := models.GetSalaryById(updatesalary.Id)
+	if err != nil {
+		return nil, err
+	}
+	if salary.UserId != authorization {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	salary.Company = updatesalary.Company
+	salary.City = updatesalary.City
+	salary.Salary = updatesalary.Salary
+	salary.Major = updatesalary.Major
+	salary.Name = updatesalary.Name
+	salary.CategoryFirst = updatesalary.CategoryFirst
+	salary.CategorySecond = updatesalary.CategorySecond
+
+	err = salary.UpdateSalary()
 	if err != nil {
 		return nil, err
 	}

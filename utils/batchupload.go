@@ -69,17 +69,6 @@ func BindJSONToStruct(jsonData []byte) (JobResponse, error) {
 	return response, nil
 }
 
-func ReadJSONFromFile(filename string) (JobResponse, error) {
-	file, err := os.Open(filename)
-	if err != nil {
-		return JobResponse{}, err
-	}
-	defer file.Close()
-
-	bytes, err := io.ReadAll(file)
-	if err != nil {
-		return JobResponse{}, err
-	}
-
+func ReadJSONFromFile(bytes []byte) (JobResponse, error) {
 	return BindJSONToStruct(bytes)
 }

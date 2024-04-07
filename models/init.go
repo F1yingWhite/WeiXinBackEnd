@@ -55,23 +55,25 @@ func ToDataBase() {
 		panic(err)
 	}
 	// 保存数据
-	response, err := utils.ReadJSONFromFile("data.json")
-	if err != nil {
-		panic(err)
-	}
-	for _, job := range response.Data.Jobs {
-		err := CreateSalary(&Salary{ // Pass a pointer to models.Salary
-			UserId:         "xyh",
-			CategoryFirst:  categoryMap[job.CategoryFirst],
-			CategorySecond: categoryMap[job.CategorySecond],
-			Company:        job.CompanyName,
-			City:           job.City,
-			Salary:         job.Salary,
-			Major:          job.Major,
-			Name:           job.Name,
-		})
+	for i := 1; i <= 8; i++ {
+		response, err := utils.ReadJSONFromFile(getData(i))
 		if err != nil {
 			panic(err)
+		}
+		for _, job := range response.Data.Jobs {
+			err := CreateSalary(&Salary{ // Pass a pointer to models.Salary
+				UserId:         "xyh",
+				CategoryFirst:  categoryMap[job.CategoryFirst],
+				CategorySecond: categoryMap[job.CategorySecond],
+				Company:        job.CompanyName,
+				City:           job.City,
+				Salary:         job.Salary,
+				Major:          job.Major,
+				Name:           job.Name,
+			})
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 }
@@ -83,18 +85,14 @@ func Migrate() {
 
 func getData(page int) []byte {
 	// 目标URL
-	url := fmt.Sprintf("https://offershow.cn/api/od/search_job?size=100&page=%d", page)
-
-	// 发送POST请求
-	resp, err := http.Post(url, "application/json", nil)
+	url := fmt.Sprintf("https://offershow.cn/api/od/search_job?size=50&page=%d", page)
+	resp, err := http.Post(url, "", nil)
 	if err != nil {
-		log.Fatalf("请求失败，错误：%v", err)
+		log.Fatalf("请求失败：%v", err)
 	}
+
 	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("读取响应失败，错误：%v", err)
-	}
 
-	return body
+	bodyBytes, _ := io.ReadAll(resp.Body)
+	return bodyBytes
 }

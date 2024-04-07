@@ -8,8 +8,8 @@ import (
 )
 
 type Salary struct {
-	gorm.Model
-	UserId         string `json:"user_id"`                 // 创建的用户ID
+	gorm.Model     `json:"-"`
+	UserId         string `json:"-"`                       // 创建的用户ID
 	Company        string `json:"company" gorm:"not null"` // 公司名称
 	City           string `json:"city" gorm:"not null"`    // 城市
 	Salary         string `json:"salary" gorm:"not null"`  // 薪资描述
