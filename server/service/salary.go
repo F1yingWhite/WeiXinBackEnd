@@ -7,30 +7,26 @@ import (
 )
 
 type CreateSalary struct {
-	Company   string `form:"company" binding:"required"`
-	City      string `form:"city" binding:"required"`
-	Position  string `form:"position" binding:"required"`
-	Salary    string `form:"salary" binding:"required"`
-	YearEnd   string `form:"year_end"`
-	Type      string `form:"type"`
-	Education string `form:"education" binding:"required"`
-	Industry  string `form:"industry"`
-	Remark    string `form:"remark"`
+	Company        string `form:"company" binding:"required"`
+	City           string `form:"city" binding:"required"`
+	Salary         string `form:"salary" binding:"required"`
+	Major          string `form:"major" binding:"required"`
+	Name           string `form:"name" binging:"required"`
+	CategoryFirst  string `form:"category_first" binging:"required"`
+	CategorySecond string `form:"category_second" binging:"required"`
 }
 
 func (createSalary *CreateSalary) Handle(c *gin.Context) (any, error) {
 	authorization := c.Request.Header.Get("Authorization")
 	salary := &models.Salary{
-		UserId:    authorization,
-		Company:   createSalary.Company,
-		City:      createSalary.City,
-		Position:  createSalary.Position,
-		Salary:    createSalary.Salary,
-		YearEnd:   createSalary.YearEnd,
-		Type:      createSalary.Type,
-		Education: createSalary.Education,
-		Industry:  createSalary.Industry,
-		Remark:    createSalary.Remark,
+		Company:        createSalary.Company,
+		City:           createSalary.City,
+		Salary:         createSalary.Salary,
+		Major:          createSalary.Major,
+		Name:           createSalary.Name,
+		CategoryFirst:  createSalary.CategoryFirst,
+		CategorySecond: createSalary.CategorySecond,
+		UserId:         authorization,
 	}
 
 	err := models.CreateSalary(salary)
@@ -97,4 +93,3 @@ type GetSalaryByUserId struct {
 func (getSalaryByUserId *GetSalaryByUserId) Handle(c *gin.Context) (any, error) {
 	return models.GetSalaryByUserId(getSalaryByUserId.UserId, getSalaryByUserId.Page, getSalaryByUserId.PageSize)
 }
-

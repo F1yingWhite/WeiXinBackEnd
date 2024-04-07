@@ -9,16 +9,14 @@ import (
 
 type Salary struct {
 	gorm.Model
-	UserId    string `json:"user_id"`                   // 创建的用户ID
-	Company   string `json:"company" gorm:"not null"`   // 公司名称
-	City      string `json:"city" gorm:"not null"`      // 城市
-	Position  string `json:"position" gorm:"not null"`  // 岗位
-	Salary    string `json:"salary" gorm:"not null"`    // 薪资描述
-	YearEnd   string `json:"year_end"`                  // 年终换算范围
-	Type      string `json:"type"`                      // 类型（校招/实习）
-	Education string `json:"education" gorm:"not null"` // 学历
-	Industry  string `json:"industry" `                 // 行业
-	Remark    string `json:"remark"`                    // 备注
+	UserId         string `json:"user_id"`                 // 创建的用户ID
+	Company        string `json:"company" gorm:"not null"` // 公司名称
+	City           string `json:"city" gorm:"not null"`    // 城市
+	Salary         string `json:"salary" gorm:"not null"`  // 薪资描述
+	Major          string `json:"major" gorm:"not null"`   // 学历
+	Name           string `json:"name"`                    // 名称
+	CategoryFirst  string `json:"category_first"`          //大分类
+	CategorySecond string `json:"category_second"`         //细分
 }
 
 func CreateSalary(salary *Salary) error {

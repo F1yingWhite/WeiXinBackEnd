@@ -1,7 +1,7 @@
-package serializer
+package utils
 
 type errorResponse struct {
-	ErrorStr  string `json:"error"`
+	ErrorStr string `json:"error"`
 }
 
 func ErrorResponse(err error) errorResponse {
