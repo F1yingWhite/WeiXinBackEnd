@@ -90,44 +90,23 @@ func (updatesalary *UpdateSalary) Handle(c *gin.Context) (any, error) {
 }
 
 type GetSalary struct {
-	Page     int    `form:"page" binding:"required"`
-	PageSize int    `form:"page_size" binding:"required"`
-	Company  string `form:"company"`
-	City     string `form:"city"`
-	UserId   string `form:"user_id"`
+	Page     int `form:"page" binding:"required"`
+	PageSize int `form:"page_size" binding:"required"`
 }
 
 func (getSalary *GetSalary) Handle(c *gin.Context) (any, error) {
-	if getSalary.Company != "" && getSalary.City != "" {
-		return models.GetSalariesByCompanyAndCity(getSalary.Company, getSalary.City, getSalary.Page, getSalary.PageSize)
+	company := c.Query("company")
+	city := c.Query("city")
+	if company != "" && city != "" {
+		return models.GetSalariesByCompanyAndCity(company, city, getSalary.Page, getSalary.PageSize)
 	}
-	if getSalary.Company != "" {
-		return models.GetSalaryByCompany(getSalary.Company, getSalary.Page, getSalary.PageSize)
+	if company != "" {
+		return models.GetSalaryByCompany(company, getSalary.Page, getSalary.PageSize)
 	}
-	if getSalary.City != "" {
-		return models.GetSalaryByCity(getSalary.City, getSalary.Page, getSalary.PageSize)
+	if city != "" {
+		return models.GetSalaryByCity(city, getSalary.Page, getSalary.PageSize)
 	}
 	return models.GetSalaries(getSalary.Page, getSalary.PageSize)
-}
-
-type GetSalaryByCompany struct {
-	Page     int    `form:"page" binding:"required"`
-	PageSize int    `form:"page_size" binding:"required"`
-	Company  string `form:"company" binding:"required"`
-}
-
-func (getSalaryByCompany *GetSalaryByCompany) Handle(c *gin.Context) (any, error) {
-	return models.GetSalaryByCompany(getSalaryByCompany.Company, getSalaryByCompany.Page, getSalaryByCompany.PageSize)
-}
-
-type GetSalaryByCity struct {
-	Page     int    `form:"page" binding:"required"`
-	PageSize int    `form:"page_size" binding:"required"`
-	City     string `form:"city" binding:"required"`
-}
-
-func (getSalaryByCity *GetSalaryByCity) Handle(c *gin.Context) (any, error) {
-	return models.GetSalaryByCity(getSalaryByCity.City, getSalaryByCity.Page, getSalaryByCity.PageSize)
 }
 
 type GetSalaryById struct {

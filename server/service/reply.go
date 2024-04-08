@@ -1,12 +1,14 @@
 package service
 
 import (
+	"crypto/sha1"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 	"unicode"
@@ -118,7 +120,41 @@ func matchInnerApi(jsonStr string) (InnerApi, error) {
 	return api, nil
 }
 
+type ReplyQuery struct {
+	Signature    string `form:"signature" binding:"required"`
+	Timestamp    string `form:"timestamp" binding:"required"`
+	Nonce        string `form:"nonce" binding:"required"`
+	Openid       string `form:"openid" binding:"required"`
+	EncryptType  string `form:"encrypt_type" binding:"required"`
+	MsgSignature string `form:"msg_signature" binding:"required"`
+}
+
+func checkSignature(signature string, timestamp string, nonce string) bool {
+	token := "xyh"
+	tmpArr := []string{token, timestamp, nonce}
+	sort.Strings(tmpArr)
+	tmpStr := ""
+	for _, v := range tmpArr {
+		tmpStr += v
+	}
+	hash := sha1.New()
+	hash.Write([]byte(tmpStr))
+	tmpStr = fmt.Sprintf("%x", hash.Sum(nil))
+
+	if tmpStr == signature {
+		return true
+	} else {
+		return false
+	}
+}
+
 func Reply(c *gin.Context) {
+	replyQuery := ReplyQuery{}
+	c.ShouldBindQuery(&replyQuery)
+	if !checkSignature(replyQuery.Signature, replyQuery.Timestamp, replyQuery.Nonce) {
+		c.String(403, "Invalid signature")
+		return
+	}
 	webData, _ := io.ReadAll(c.Request.Body)
 	recMsg, err := parseXml(webData)
 	if err != nil {
@@ -144,57 +180,64 @@ func Reply(c *gin.Context) {
 		innerapi, err := matchInnerApi(recMsg.TextContent)
 		if err != nil {
 			log.Printf("Failed to match inner api: %s\n", err.Error())
-			replyMsg.Content = `你好鸭，这是由超帅的许一涵开发的后端，如果希望获取更多信息，请输入正确的格式，例如：{"method":"GET","url":"/user/get"}
-			{
-				"method":"POST",
-				"url":"/user/update",
-				"json_data":{
-					"username":"许一涵",
-					"signature":"我很强"
-				}
-			}
-			
-			
-			{"method":"GET","url":"/salary/?page_size=5&page=1"}
-			{"method":"GET","url":"/salary/getByCompany?page_size=5&page=1&company=华硕"}
-			{"method":"GET","url":"/salary/getByCompany?page_size=5&page=1&company=华"}
-			{"method":"GET","url":"/salary/getByCity?page_size=5&page=1&city=北京"}
-			{"method":"GET","url":"/salary/getByCompanyAndCity?page_size=5&page=1&city=北京&company=狐"}
-			{"method":"GET","url":"/salary/getById?id=1"}
-			{"method":"GET","url":"/salary/getByUserId?page_size=5&page=1&user_id=obGiG6n3SPlTapeLcCVx2VAg1la8"}
-			{
-				"method":"POST",
-				"url":"/salary/create",
-				"json_data":{
-					"Company":"华为",
-					"City":"北京",
-					"Salary":"20w",
-					"Major":"软件工程",
-					"CategoryFirst":"技术/开发",
-					"CategorySecond":"前端开发"
-				}
-			}
-			
-			{
-				"method":"DELETE",
-				"url":"/api/salary/id=?"
-			}
-			
-			{
-				"method":"POST",
-				"url":"/salary/creates",
-				"json_data":{
-					"salaries":[
-						{
-							"Company":"字节跳动",
-							"City":"北京",
-							"Salary":"230w",
-							"Major":"软件工程",
-							"CategoryFirst":"技术/开发",
-							"CategorySecond":"前端开发"
-						}...
-				}
-			}`
+			replyMsg.Content = `你好鸭，这是由超帅的许一涵开发的后端，如果希望获取更多信息，请输入正确的格式，例如：
+{"method":"GET","url":"/user/get"}
+{
+    "method":"POST",
+    "url":"/user/update",
+    "json_data":{
+        "username":"许一涵",
+        "signature":"我很帅"
+    }
+}
+
+
+{"method":"GET","url":"/salary?page_size=5&page=1&company=狐&city=北京"}
+{"method":"GET","url":"/salary/getById?id=1"}
+{"method":"GET","url":"/salary/getByUserId?page_size=5&page=1&user_id=obGiG6n3SPlTapeLcCVx2VAg1la8"}
+{
+    "method":"POST",
+    "url":"/salary/create",
+    "json_data":{
+        "Company":"华为",
+        "City":"北京",
+        "Salary":"20w",
+        "Major":"软件工程",
+        "CategoryFirst":"技术/开发",
+        "CategorySecond":"前端开发"
+    }
+}
+
+{
+    "method":"DELETE",
+    "url":"/salary?id=?"
+}
+
+{
+    "method":"POST",
+    "url":"/salary/creates",
+    "json_data":{
+        "salaries":[
+            {
+                "Company":"字节跳动",
+                "City":"北京",
+                "Salary":"230w",
+                "Major":"软件工程",
+                "CategoryFirst":"技术/开发",
+                "CategorySecond":"前端开发"
+            },
+            {
+                "Company":"字节跳",
+                "City":"北京",
+                "Salary":"300w",
+                "Major":"软件工程",
+                "CategoryFirst":"技术/开发",
+                "CategorySecond":"前端开发"
+            }
+        ]
+        
+    }
+}`
 			c.String(200, replyMsg.send())
 			return
 		} else {
@@ -206,7 +249,7 @@ func Reply(c *gin.Context) {
 				return
 			}
 			jsonDataStr := string(jsonDataBytes)
-			req, err := http.NewRequest(innerapi.Method, "http://127.0.0.1:8888/api"+innerapi.Url, strings.NewReader(jsonDataStr))
+			req, err := http.NewRequest(innerapi.Method, "http://0.0.0.0:8888/api"+innerapi.Url, strings.NewReader(jsonDataStr))
 			if err != nil {
 				replyMsg.Content = "创建请求失败: " + err.Error()
 				c.String(500, replyMsg.send())

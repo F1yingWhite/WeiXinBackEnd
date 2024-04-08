@@ -3,20 +3,22 @@ package models
 import (
 	"fmt"
 	"log"
-
-	"gorm.io/gorm"
+	"time"
 )
 
 type Salary struct {
-	gorm.Model     `json:"-"`
-	UserId         string `json:"-"`                       // 创建的用户ID
-	Company        string `json:"company" gorm:"not null"` // 公司名称
-	City           string `json:"city" gorm:"not null"`    // 城市
-	Salary         string `json:"salary" gorm:"not null"`  // 薪资描述
-	Major          string `json:"major" gorm:"not null"`   // 学历
-	Name           string `json:"name"`                    // 名称
-	CategoryFirst  string `json:"category_first"`          //大分类
-	CategorySecond string `json:"category_second"`         //细分
+	ID             uint       `gorm:"primary_key" json:"id"`
+	CreatedAt      time.Time  `json:"-"`
+	UpdatedAt      time.Time  `json:"-"`
+	DeletedAt      *time.Time `sql:"index" json:"-"`
+	UserId         string     `json:"-"`                       // 创建的用户ID
+	Company        string     `json:"company" gorm:"not null"` // 公司名称
+	City           string     `json:"city" gorm:"not null"`    // 城市
+	Salary         string     `json:"salary" gorm:"not null"`  // 薪资描述
+	Major          string     `json:"major" gorm:"not null"`   // 学历
+	Name           string     `json:"name"`                    // 名称
+	CategoryFirst  string     `json:"category_first"`          //大分类
+	CategorySecond string     `json:"category_second"`         //细分
 }
 
 func CreateSalary(salary *Salary) error {

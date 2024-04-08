@@ -1,6 +1,7 @@
 package server
 
 import (
+	"weixin_backend/server/middlewares"
 	"weixin_backend/server/service"
 
 	"github.com/gin-contrib/cors"
@@ -25,25 +26,20 @@ func InitRouter() *gin.Engine {
 		api.GET("ping", service.WX_authorization)
 		api.POST("ping", service.Reply)
 		trueApi := api.Group("")
+		trueApi.Use(middlewares.IPAuthMiddleware())
 		{
 			user := trueApi.Group("user")
 			{
-				// get /api/user/get | 用于获取用户信息
-				user.GET("get", service.HandlerNoBind(&service.UserInfo{}))
-				// post /api/user/update | 用于更新用户信息
-				user.POST("update", service.HandlerBind(&service.UpdateUserInfo{}))
+				// get /api/user | 用于获取用户信息
+				user.GET("", service.HandlerNoBind(&service.UserInfo{}))
+				// post /api/user | 用于更新用户信息
+				user.PUT("", service.HandlerBind(&service.UpdateUserInfo{}))
 			}
 
 			salary := trueApi.Group("salary")
 			{
-				// get /api/salary/?page_size=?&page=? | 用于检索信息
+				// get /api/salary?page_size=?&page=?&city=?&company=? | 用于检索信息
 				salary.GET("", service.HandlerBindQuery(&service.GetSalary{}))
-				// get /api/salary/getByCompany?page_size=?&page=?&company=? | 用于检索信息
-				salary.GET("getByCompany", service.HandlerBindQuery(&service.GetSalaryByCompany{}))
-				// get /api/salary/getByCity?page_size=?&page=?&city=? | 用于检索信息
-				salary.GET("getByCity", service.HandlerBindQuery(&service.GetSalaryByCity{}))
-				// get /api/salary/getByCompanyAndCity?page_size=?&page=?&company=?&city=? | 用于检索信息
-				salary.GET("getByCompanyAndCity", service.HandlerBindQuery(&service.GetSalariesByCompanyAndCity{}))
 				// get /api/salary/getByUserId?page_size=?&page=?&user_id=? | 用于检索信息
 				salary.GET("getByUserId", service.HandlerBindQuery(&service.GetSalaryByUserId{}))
 				// get /api/salary/getById?id=? | 用于检索信息
@@ -54,7 +50,7 @@ func InitRouter() *gin.Engine {
 				salary.POST("creates", service.HandlerBind(&service.CreateSalaries{}))
 				// PUT /api/salary | 修改信息
 				salary.PUT("", service.HandlerBind(&service.UpdateSalary{}))
-				// DELETE /api/salary/id=? | 删除信息
+				// DELETE /api/salary?id=? | 删除信息
 				salary.DELETE("", service.HandlerBindQuery(&service.DeleteSalary{}))
 			}
 		}

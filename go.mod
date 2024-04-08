@@ -1,12 +1,14 @@
 module weixin_backend
 
-go 1.22.2
+go 1.22.1
 
 require (
+	github.com/chenxue4076/go-wechat-encryption v1.3.6
 	github.com/gin-contrib/cors v1.7.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/glebarez/sqlite v1.11.0
 	gorm.io/gorm v1.25.9
+
 )
 
 require (
