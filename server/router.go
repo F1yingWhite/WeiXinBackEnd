@@ -21,14 +21,14 @@ func InitRouter() *gin.Engine {
 	api := r.Group("api")
 	api.Use(gin.Recovery())
 	{
-		//默认接口，用于
+		//默认接口，用于与微信对接
 		api.GET("ping", service.WX_authorization)
 		api.POST("ping", service.Reply)
 		trueApi := api.Group("")
 		{
 			user := trueApi.Group("user")
 			{
-				// get /api/user/get?user_id=xxx | 用于获取用户信息
+				// get /api/user/get | 用于获取用户信息
 				user.GET("get", service.HandlerNoBind(&service.UserInfo{}))
 				// post /api/user/update | 用于更新用户信息
 				user.POST("update", service.HandlerBind(&service.UpdateUserInfo{}))

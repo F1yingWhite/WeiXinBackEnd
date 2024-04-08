@@ -19,7 +19,7 @@
 {"method":"GET","url":"/salary/getByCity?page_size=5&page=1&city=北京"}
 {"method":"GET","url":"/salary/getByCompanyAndCity?page_size=5&page=1&city=北京&company=狐"}
 {"method":"GET","url":"/salary/getById?id=1"}
-
+{"method":"GET","url":"/salary/getByUserId?page_size=5&page=1&user_id=obGiG6n3SPlTapeLcCVx2VAg1la8"}
 {
     "method":"POST",
     "url":"/salary/create",
@@ -31,6 +31,11 @@
         "CategoryFirst":"技术/开发",
         "CategorySecond":"前端开发"
     }
+}
+
+{
+    "method":"DELETE",
+    "url":"/api/salary/id=?"
 }
 
 {

@@ -90,11 +90,23 @@ func (updatesalary *UpdateSalary) Handle(c *gin.Context) (any, error) {
 }
 
 type GetSalary struct {
-	Page     int `form:"page" binding:"required"`
-	PageSize int `form:"page_size" binding:"required"`
+	Page     int    `form:"page" binding:"required"`
+	PageSize int    `form:"page_size" binding:"required"`
+	Company  string `form:"company"`
+	City     string `form:"city"`
+	UserId   string `form:"user_id"`
 }
 
 func (getSalary *GetSalary) Handle(c *gin.Context) (any, error) {
+	if getSalary.Company != "" && getSalary.City != "" {
+		return models.GetSalariesByCompanyAndCity(getSalary.Company, getSalary.City, getSalary.Page, getSalary.PageSize)
+	}
+	if getSalary.Company != "" {
+		return models.GetSalaryByCompany(getSalary.Company, getSalary.Page, getSalary.PageSize)
+	}
+	if getSalary.City != "" {
+		return models.GetSalaryByCity(getSalary.City, getSalary.Page, getSalary.PageSize)
+	}
 	return models.GetSalaries(getSalary.Page, getSalary.PageSize)
 }
 

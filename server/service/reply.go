@@ -144,7 +144,57 @@ func Reply(c *gin.Context) {
 		innerapi, err := matchInnerApi(recMsg.TextContent)
 		if err != nil {
 			log.Printf("Failed to match inner api: %s\n", err.Error())
-			replyMsg.Content = `你好鸭，这是由超帅的许一涵开发的后端，如果希望获取更多信息，请输入正确的格式，例如：{"method":"get","url":"/search?company=华为&city=北京",json_data:"..."}`
+			replyMsg.Content = `你好鸭，这是由超帅的许一涵开发的后端，如果希望获取更多信息，请输入正确的格式，例如：{"method":"GET","url":"/user/get"}
+			{
+				"method":"POST",
+				"url":"/user/update",
+				"json_data":{
+					"username":"许一涵",
+					"signature":"我很强"
+				}
+			}
+			
+			
+			{"method":"GET","url":"/salary/?page_size=5&page=1"}
+			{"method":"GET","url":"/salary/getByCompany?page_size=5&page=1&company=华硕"}
+			{"method":"GET","url":"/salary/getByCompany?page_size=5&page=1&company=华"}
+			{"method":"GET","url":"/salary/getByCity?page_size=5&page=1&city=北京"}
+			{"method":"GET","url":"/salary/getByCompanyAndCity?page_size=5&page=1&city=北京&company=狐"}
+			{"method":"GET","url":"/salary/getById?id=1"}
+			{"method":"GET","url":"/salary/getByUserId?page_size=5&page=1&user_id=obGiG6n3SPlTapeLcCVx2VAg1la8"}
+			{
+				"method":"POST",
+				"url":"/salary/create",
+				"json_data":{
+					"Company":"华为",
+					"City":"北京",
+					"Salary":"20w",
+					"Major":"软件工程",
+					"CategoryFirst":"技术/开发",
+					"CategorySecond":"前端开发"
+				}
+			}
+			
+			{
+				"method":"DELETE",
+				"url":"/api/salary/id=?"
+			}
+			
+			{
+				"method":"POST",
+				"url":"/salary/creates",
+				"json_data":{
+					"salaries":[
+						{
+							"Company":"字节跳动",
+							"City":"北京",
+							"Salary":"230w",
+							"Major":"软件工程",
+							"CategoryFirst":"技术/开发",
+							"CategorySecond":"前端开发"
+						}...
+				}
+			}`
 			c.String(200, replyMsg.send())
 			return
 		} else {
