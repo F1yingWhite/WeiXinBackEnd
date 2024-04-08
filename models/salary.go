@@ -31,6 +31,18 @@ func CreateSalary(salary *Salary) error {
 	return nil
 }
 
+func DeteleSalaryById(id uint) error {
+	logPrefix := fmt.Sprintf("[models/Salary]: DeteleSalaryById(id: %d)", id)
+
+	log.Printf("%s: 正在删除...", logPrefix)
+	if err := DB.Where("id = ?", id).Delete(&Salary{}).Error; err != nil {
+		log.Printf("%s: 删除失败(%s)", logPrefix, err)
+		return err
+	}
+	log.Printf("%s: 删除成功", logPrefix)
+	return nil
+}
+
 func GetSalaries(page, pageSize int) ([]Salary, error) {
 	logPrefix := "[models/Salary]: GetSalaries()"
 

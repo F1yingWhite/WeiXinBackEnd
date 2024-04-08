@@ -146,3 +146,24 @@ type GetSalaryByUserId struct {
 func (getSalaryByUserId *GetSalaryByUserId) Handle(c *gin.Context) (any, error) {
 	return models.GetSalaryByUserId(getSalaryByUserId.UserId, getSalaryByUserId.Page, getSalaryByUserId.PageSize)
 }
+
+type DeleteSalary struct {
+	Id uint `form:"id" binding:"required"`
+}
+
+func (deleteSalary *DeleteSalary) Handle(c *gin.Context) (any, error) {
+	authorization := c.Request.Header.Get("Authorization")
+	salary, err := models.GetSalaryById(deleteSalary.Id)
+	if err != nil {
+		return nil, err
+	}
+	if salary.UserId != authorization {
+		return nil, fmt.Errorf("unauthorized")
+	}
+
+	err = models.DeteleSalaryById(deleteSalary.Id)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{"msg": "success"}, nil
+}

@@ -54,6 +54,8 @@ func InitRouter() *gin.Engine {
 				salary.POST("creates", service.HandlerBind(&service.CreateSalaries{}))
 				// PUT /api/salary | 修改信息
 				salary.PUT("", service.HandlerBind(&service.UpdateSalary{}))
+				// DELETE /api/salary/id=? | 删除信息
+				salary.DELETE("", service.HandlerBindQuery(&service.DeleteSalary{}))
 			}
 		}
 	}
